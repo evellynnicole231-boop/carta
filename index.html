@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cartinha Virtual com Música</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Georgia', serif;
+      font-size: 15px;
+      background: linear-gradient(145deg, #1c010d, #66030d, #910528);
+      background-size: 400% 400%;
+      animation: fundoAnimado 15s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      color: #3a1a1a;
+      position: relative;
+    }
+
+    /* Contêiner para os corações e brilhos */
+    #hearts-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    /* Coração vermelho estilizado */
+    .heart {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: #e10600;
+      opacity: 0.85;
+      transform: rotate(45deg);
+      animation: flutuar linear forwards;
+      filter: drop-shadow(0 0 4px #ff4c4c);
+      box-shadow: 0 0 8px #ff0000;
+    }
+
+    .heart::before,
+    .heart::after {
+      content: '';
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: #e10600;
+      border-radius: 50%;
+      box-shadow: 0 0 6px #ff4c4c;
+    }
+
+    .heart::before {
+      top: -7.5px;
+      left: 0;
+    }
+
+    .heart::after {
+      left: -7.5px;
+      top: 0;
+    }
+
+    /* Brilhos pequenos */
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #ff9999;
+      border-radius: 50%;
+      opacity: 0.8;
+      filter: drop-shadow(0 0 5px #ffbbbb);
+      animation: sparkleAnim linear forwards;
+      box-shadow: 0 0 8px 3px #ff9999;
+    }
+
+    @keyframes sparkleAnim {
+      0% {
+        transform: translateY(100vh) scale(0.6);
+        opacity: 0;
+      }
+      30% {
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+      }
+    }
+
+    @keyframes flutuar {
+      0% {
+        transform: translateY(100vh) rotate(45deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.85;
+      }
+      100% {
+        transform: translateY(-10vh) rotate(45deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes fundoAnimado {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .cartinha {
+      background-color: rgba(206, 70, 70, 0.95);
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+      padding: 25px 18px;
+      max-width: 700px;
+      width: 95%;
+      text-align: center;
+      animation: aparecer 1s ease-out;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 10px;
+      color: #1f0707;
+    }
+
+    p {
+      font-size: 0.95em;
+      line-height: 1.6;
+      margin: 15px 0 25px 0;
+    }
+.carrossel img {
+  width: 40%;
+  max-height: 300px;
+  border-radius: 30px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.15);
+  display: none;
+  object-fit: cover;
+  margin: 0 auto; /* <-- Centraliza a imagem */
+}
+
+
+    .carrossel img.ativo {
+      display: block;
+    }
+
+    .botoes-carrossel button {
+      background-color: #161414;
+      border: none;
+      color: rgb(128, 16, 16);
+      padding: 6px 10px;
+      margin: 0 5px;
+      border-radius: 6px;
+      font-size: 0.8em;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .botoes-carrossel button:hover {
+      background-color: #0e0d0d;
+      .botoes-carrossel {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px; /* Espaço entre a imagem e os botões */
+}
+
+    }
+
+    audio {
+      margin-top: auto 0;
+      width: 800%;
+      border-radius: 6px;
+      height: 100px;
+      outline: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .titulo-temporizador {
+      font-size: 1.4em;
+      margin: 20px 0 10px;
+      color: #610608;
+      font-weight: bold;
+    }
+
+    #contador-romantico {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    #contador-romantico div {
+      background-color: #0c0b0c;
+      padding: 12px;
+      border-radius: 10px;
+      min-width: 65px;
+      box-shadow: 0 3px 10px rgba(127, 1, 1, 0.2);
+      transition: transform 0.3s ease;
+      cursor: default;
+    }
+
+    #contador-romantico div:hover {
+      transform: scale(1.1);
+    }
+
+    #contador-romantico span {
+      font-size: 1.8em;
+      color: #a12426;
+      font-weight: bold;
+      font-family: 'Georgia', serif;
+    }
+
+    #contador-romantico label {
+      font-size: 0.85em;
+      color: #7a1f1f;
+      font-style: italic;
+    }
+
+    @keyframes aparecer {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .cartinha {
+        padding: 18px 12px;
+      }
+      h1 {
+        font-size: 1.5em;
+      }
+      p {
+        font-size: 0.9em;
+      }
+      #contador-romantico div {
+        padding: 8px;
+        min-width: 55px;
+      }
+      #contador-romantico span {
+        font-size: 1.5em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Corações e brilhos animados -->
+  <div id="hearts-container"></div>
+
+  <div class="cartinha">
+    <p>
+      ❤️‍🔥Meu vagabundo,❤️‍🔥<br><br>
+      Quero que saiba que cada momento que vivo ao seu lado, tem sido os melhores da minha vida! Estamos juntos a um ano colecionando muitas memórias de muito amor e cuidado. Desde o momento em que aceitei estar ao seu lado, tem me feito a pessoa mais feliz do mundo.<br>
+      Cada segundo ao seu lado tem sido épico, cada risada, choro e carinho me transforma a cada dia. Eu te vivo eternamente, meu baby!<br>
+      Sei que essa data se repetirá por muitos anos, até nossa morte, pois quero me casar com você exatamente nessa data. Ela marcou minha vida e continuará marcando para sempre!<br><br>
+      Com todo o meu amor,<br>
+      <strong>sua Dama 🤍</strong>
+    </p>
+
+    <div class="carrossel">
+      <img src="https://i.postimg.cc/jqW7NRQK/Screenshot-20250604-183403-Fotos.jpg" class="ativo" alt="Foto 1" />
+      <img src="https://i.postimg.cc/4dxFwY4W/IMG-20250515-WA0032.jpg" alt="Foto 2" />
+      <img src="https://i.postimg.cc/yNdbyJ8v/IMG-20250515-WA0033.jpg" alt="Foto 3" />
+      <img src="https://i.postimg.cc/ZY3q4nx9/IMG-20250802-WA0048.jpg"  alt="Foto 4" />
+      <img src="https://i.postimg.cc/7YRDzy9v/IMG-20250906-WA0017.jpg"  alt="Foto 5" />
+      <img src="https://i.postimg.cc/9Qg8xWSb/IMG-20250906-WA0050.jpg"  alt="Foto 5" />
+      <img src="https://i.postimg.cc/q70sXWBw/Screenshot-20250916-143446-Instagram.jpg"  alt="Foto 6" />
+
+      
+
+
+      <div class="botoes-carrossel">
+        <button onclick="mudarImagem(-1)">⟨</button>
+        <button onclick="mudarImagem(1)">⟩</button>
+      </div>
+    </div>
+<iframe
+  src="https://open.spotify.com/embed/track/2Wg5y0uqhixTS7Jv7jZTMn"
+  width="300"
+  height="80"
+  frameborder="0"
+  allowtransparency="true"
+  allow="encrypted-media">
+</iframe>
+
+
+    <div class="titulo-temporizador">⏳Colecionando momentos há:⏳</div>
+    <div id="contador-romantico">
+      <div><span id="dias">00</span><label>Dias</label></div>
+      <div><span id="horas">00</span><label>Horas</label></div>
+      <div><span id="minutos">00</span><label>Minutos</label></div>
+      <div><span id="segundos">00</span><label>Segundos</label></div>
+    </div>
+  </div>
+
+  <script>
+    const dataInicio = new Date('2024-12-13T00:00:00');
+
+    function atualizarContadorRomantico() {
+      const agora = new Date();
+      const diff = agora - dataInicio;
+
+      if (diff < 0) {
+        document.getElementById('contador-romantico').innerHTML = "Ainda não começou!";
+        return;
+      }
+
+      const totalSegundos = Math.floor(diff / 1000);
+      const dias = Math.floor(totalSegundos / (60 * 60 * 24));
+      const horas = Math.floor((totalSegundos % (60 * 60 * 24)) / (60 * 60));
+      const minutos = Math.floor((totalSegundos % (60 * 60)) / 60);
+      const segundos = totalSegundos % 60;
+
+      document.getElementById('dias').textContent = dias.toString().padStart(2, '0');
+      document.getElementById('horas').textContent = horas.toString().padStart(2, '0');
+      document.getElementById('minutos').textContent = minutos.toString().padStart(2, '0');
+      document.getElementById('segundos').textContent = segundos.toString().padStart(2, '0');
+    }
+
+    setInterval(atualizarContadorRomantico, 1000);
+    atualizarContadorRomantico();
+
+    let slideAtual = 0;
+    const slides = document.querySelectorAll('.carrossel img');
+
+    function mudarImagem(direcao) {
+      slides[slideAtual].classList.remove('ativo');
+      slideAtual = (slideAtual + direcao + slides.length) % slides.length;
+      slides[slideAtual].classList.add('ativo');
+    }
+
+    // Função para criar corações vermelhos
+    function criarCoracao() {
+      const container = document.getElementById('hearts-container');
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+
+      // Posição horizontal aleatória
+      heart.style.left = Math.random() * 100 + 'vw';
+
+      // Duração da animação entre 10 e 20 segundos
+      const duracao = 10000 + Math.random() * 10000;
+      heart.style.animationDuration = duracao + 'ms';
+
+      // Tamanho aleatório entre 10 e 25px
+      const tamanho = 10 + Math.random() * 15;
+      heart.style.width = tamanho + 'px';
+      heart.style.height = tamanho + 'px';
+
+      // Ajustar pseudo elementos ::before e ::after para o tamanho correto
+      heart.style.setProperty('--heart-size', tamanho + 'px');
+
+      container.appendChild(heart);
+
+      // Remove após animação
+      setTimeout(() => {
+        heart.remove();
+      }, duracao);
+    }
+
+    // Função para criar brilhos
+    function criarBrilho() {
+      const container = document.getElementById('hearts-container');
+      const sparkle = document.createElement('div');
+      sparkle.classList.add('sparkle');
+
+      sparkle.style.left = Math.random() * 100 + 'vw';
+
+      const duracao = 5000 + Math.random() * 7000;
+      sparkle.style.animationDuration = duracao + 'ms';
+
+      const tamanho = 2 + Math.random() * 3;
+      sparkle.style.width = tamanho + 'px';
+      sparkle.style.height = tamanho + 'px';
+
+      container.appendChild(sparkle);
+
+      setTimeout(() => {
+        sparkle.remove();
+      }, duracao);
+    }
+
+    // Criar corações a cada 300ms e brilhos a cada 200ms para efeito contínuo
+    setInterval(criarCoracao, 300);
+    setInterval(criarBrilho, 200);
+  </script>
+</body>
+</html>
